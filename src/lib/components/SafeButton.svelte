@@ -14,8 +14,8 @@
       return (clickedOnce = true);
     }
     if (timeoutId) clearTimeout(timeoutId);
-    callback();
     clickedOnce = false;
+    callback();
   }
 </script>
 

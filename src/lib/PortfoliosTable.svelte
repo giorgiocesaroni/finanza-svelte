@@ -1,10 +1,15 @@
 <script>
-  import { addPortfolio, subscribeToCollection } from "../Firestore";
+  import {
+    addPortfolio,
+    deletePortfolio,
+    subscribeToCollection,
+  } from "../Firestore";
   import {
     authStore,
     selectedExpenseStore,
     selectedPortfolioStore,
   } from "../stores";
+  import SafeButton from "./components/SafeButton.svelte";
   export let title;
 
   let portfolios;
@@ -28,6 +33,7 @@
   });
 
   function handleSelect(id) {
+    if (id === selectedPortfolio?.id) return selectedPortfolioStore.set(null);
     selectedPortfolioStore.set({ ...portfolios[id], id });
   }
 
@@ -43,6 +49,12 @@
     });
 
     textValue = "";
+  }
+
+  function handleDeletePortfolio() {
+    deletePortfolio(authorization.user.uid, selectedPortfolio.id);
+    selectedExpenseStore.set(null);
+    selectedPortfolioStore.set(null);
   }
 </script>
 
@@ -60,8 +72,15 @@
       {/each}
     </table>
   {/if}
-  <input on:input={handleChange} value={textValue} type="text" />
-  <button on:click={handleCreatePortfolio} disabled={!textValue}>Add</button>
+  <form>
+    <input on:input={handleChange} value={textValue} type="text" />
+    <button type="submit" on:click={handleCreatePortfolio} disabled={!textValue}
+      >Add</button
+    >
+  </form>
+  <SafeButton callback={handleDeletePortfolio} disabled={!selectedPortfolio}
+    >Delete portfolio</SafeButton
+  >
 </div>
 
 <style>

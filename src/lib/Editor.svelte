@@ -1,4 +1,5 @@
 <script>
+  import { blurOnEnter } from "../lib/utilities/inputDirectives";
   import { addExpense, deleteExpense, updateExpense } from "../Firestore";
   import {
     authStore,
@@ -6,6 +7,8 @@
     selectedPortfolioStore,
   } from "../stores";
   import SafeButton from "./components/SafeButton.svelte";
+  import RadioSwitch from "./components/RadioSwitch.svelte";
+import supportedCategories from "./utilities/mockSupportedCategories";
 
   let auth;
   authStore.subscribe(value => (auth = value));
@@ -36,7 +39,7 @@
   }
 
   function handleSubmit() {
-    if (editingExpense.id) {
+    if (editingExpense?.id) {
       updateExpense(
         auth.user.uid,
         selectedPortfolio.id,
@@ -60,20 +63,7 @@
   <h1>Editor</h1>
   <form>
     <input
-      on:input={e => handleChange("category", e.target.value)}
-      on:keydown={handleKeyDown}
-      value={editingExpense?.category ?? ""}
-      placeholder="Category"
-      class="category"
-    />
-    <input
-      on:input={e => handleChange("price", e.target.value)}
-      on:keydown={handleKeyDown}
-      value={editingExpense?.price ?? ""}
-      placeholder="Price"
-      class="price"
-    />
-    <input
+      use:blurOnEnter
       on:input={e => handleChange("date", e.target.value)}
       on:keydown={handleKeyDown}
       value={editingExpense?.date ?? ""}
@@ -81,11 +71,25 @@
       class="date"
     />
     <input
+      use:blurOnEnter
       on:input={e => handleChange("notes", e.target.value)}
       on:keydown={handleKeyDown}
       value={editingExpense?.notes ?? ""}
       placeholder="Notes"
       class="notes"
+    />
+    <input
+      use:blurOnEnter
+      on:input={e => handleChange("price", e.target.value)}
+      on:keydown={handleKeyDown}
+      value={editingExpense?.price ?? ""}
+      placeholder="Price"
+      class="price"
+    />
+    <RadioSwitch
+      onChange={value => handleChange("category", value)}
+      value={editingExpense?.category}
+      options={supportedCategories}
     />
   </form>
 
@@ -93,8 +97,19 @@
     <button
       on:click={handleClear}
       disabled={!editingExpense}
-      class="clear-button">Clear</button
+      class="clear-button"
     >
+      Clear
+    </button>
+
+    <button
+      on:click={handleSubmit}
+      disabled={!editingExpense}
+      class="submit-button"
+    >
+      Submit
+    </button>
+
     <SafeButton callback={handleDelete} disabled={!editingExpense}>
       Delete
     </SafeButton>
@@ -102,23 +117,13 @@
 </div>
 
 <style>
-  .active {
-    background-color: red;
-    color: white;
-  }
-
-  .selected {
-    color: white;
-    background: blue;
-  }
-
   form {
     margin-bottom: 1rem;
   }
 
   form input {
-    color: inherit;
-    background: inherit;
+    color: white;
+    background: black;
     width: 100%;
     border: none;
   }
@@ -126,5 +131,10 @@
   form input::placeholder {
     color: inherit;
     opacity: 0.75;
+  }
+
+  .price {
+    text-align: right;
+    font-size: 1.5rem;
   }
 </style>

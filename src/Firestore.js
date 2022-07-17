@@ -12,19 +12,11 @@ import {
 } from "firebase/firestore";
 import { db } from "./Firebase";
 
-/**
- * Basic Crud Functions
- *
- * get
- * subscribe
- * create (add)
- * update
- * delete
- */
-export async function getCollection(uid, collectionId) {
-  if (!(uid || collectionId)) return;
+// Basic Crud Functions
+export async function getCollection(uid, path) {
+  if (!(uid || path)) return;
 
-  const q = query(collection(db, `users/${uid}/${collectionId}`));
+  const q = query(collection(db, `users/${uid}/${path}`));
   const snap = await getDocs(q);
 
   const entries = {};
@@ -35,9 +27,18 @@ export async function getCollection(uid, collectionId) {
   return entries;
 }
 
-export function subscribeToCollection(uid, collectionId, onUpdate) {
+export function subscribeToCollection(uid, path, onUpdate, order) {
   if (!(uid || collection || onUpdate)) return;
-  const expensesQuery = query(collection(db, `users/${uid}/${collectionId}`));
+
+  let expensesQuery;
+  if (order) {
+    expensesQuery = query(
+      collection(db, `users/${uid}/${path}`),
+      orderBy(order.field, order.direction)
+    );
+  } else {
+    expensesQuery = query(collection(db, `users/${uid}/${path}`));
+  }
 
   const unsubscribe = onSnapshot(expensesQuery, snap => {
     const entries = {};
@@ -51,33 +52,29 @@ export function subscribeToCollection(uid, collectionId, onUpdate) {
   return unsubscribe;
 }
 
-export function addDocument(uid, documentName, entry = {}) {
-  if (!(uid || documentName)) return;
-  addDoc(collection(db, `users/${uid}/${documentName}`), entry);
+export function addDocument(uid, path, entry) {
+  if (!(uid || path || entry)) return;
+  addDoc(collection(db, `users/${uid}/${path}`), entry);
 }
 
-export function updateDocument(uid, collectionId, documentId, entry) {
+export function updateDocument(uid, path, entry) {
   if (!uid) return;
-  const docRef = doc(
-    db,
-    `users/${uid}/portfolios/${collectionId}/${documentId}`
-  );
+  const docRef = doc(db, `users/${uid}/${path}`);
   updateDoc(docRef, entry);
 }
 
-export function deleteDocument(uid, collectionId, documentId) {
-  if (!(uid || collectionId || documentId)) return;
-  deleteDoc(doc(db, `users/${uid}/${collectionId}/${documentId}`));
+export function deleteDocument(uid, path) {
+  if (!(uid || path)) return;
+  deleteDoc(doc(db, `users/${uid}/${path}`));
 }
 
-/**
- * Domain Specific Handlers
- */
+// Domain Specific Handlers
 export function subscribeExpenses(uid, portfolio, onUpdate) {
   return subscribeToCollection(
     uid,
     `portfolios/${portfolio}/expenses`,
-    onUpdate
+    onUpdate,
+    { field: "date", direction: "desc" }
   );
 }
 
@@ -87,6 +84,10 @@ export function getPortfolios(uid) {
 
 export function addPortfolio(uid, portfolio) {
   return addDocument(uid, `portfolios`, portfolio);
+}
+
+export function deletePortfolio(uid, portfolio) {
+  return deleteDocument(uid, `portfolios/${portfolio}`);
 }
 
 export function getSubscriptions(uid) {
@@ -102,9 +103,9 @@ export function addSubscription(uid, subscription) {
 }
 
 export function updateExpense(uid, portfolio, expenseId, expense) {
-  updateDocument(uid, `${portfolio}/expenses`, expenseId, expense);
+  updateDocument(uid, `portfolios/${portfolio}/expenses/${expenseId}`, expense);
 }
 
 export function deleteExpense(uid, portfolio, expenseId) {
-  deleteDocument(uid, `portfolios/${portfolio}/expenses`, expenseId);
+  deleteDocument(uid, `portfolios/${portfolio}/expenses/${expenseId}`);
 }
