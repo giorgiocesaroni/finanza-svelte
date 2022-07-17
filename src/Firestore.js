@@ -102,7 +102,7 @@ export function addSubscription(uid, subscription) {
 }
 
 export function updateExpense(uid, portfolio, expenseId, expense) {
-  updateDocument(uid, `portfolio/${portfolio}/expenses`, expenseId, expense);
+  updateDocument(uid, `${portfolio}/expenses`, expenseId, expense);
 }
 
 export function deleteExpense(uid, portfolio, expenseId) {
