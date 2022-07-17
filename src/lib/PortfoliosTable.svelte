@@ -1,20 +1,23 @@
 <script>
+  import { addPortfolio, subscribeToCollection } from "../Firestore";
   import {
     authStore,
     selectedExpenseStore,
     selectedPortfolioStore,
   } from "../stores";
-  import { getPortfolios } from "../Firestore";
   export let title;
 
-  let portfolios = {};
-  authStore.subscribe(async auth => {
+  let portfolios;
+  let authorization, unsubscribe;
+  authStore.subscribe(auth => {
     if (!auth) return;
-    const res = await getPortfolios(auth.user.uid);
-    portfolios = res;
-    selectedPortfolioStore.set({
-      ...portfolios[Object.keys(portfolios)[0]],
-      id: Object.keys(portfolios)[0],
+    authorization = auth;
+
+    if (unsubscribe) unsubscribe();
+
+    console.log(auth.user.uid);
+    unsubscribe = subscribeToCollection(auth.user.uid, "portfolios", value => {
+      portfolios = value;
     });
   });
 
@@ -27,20 +30,38 @@
   function handleSelect(id) {
     selectedPortfolioStore.set({ ...portfolios[id], id });
   }
+
+  let textValue = "";
+  function handleChange(event) {
+    const value = event.target.value;
+    textValue = value;
+  }
+
+  async function handleCreatePortfolio() {
+    addPortfolio(authorization.user.uid, {
+      name: textValue,
+    });
+
+    textValue = "";
+  }
 </script>
 
 <div class="table module">
   <h1>{title}</h1>
-  <table>
-    {#each Object.keys(portfolios) as key}
-      <tr
-        class={selectedPortfolio.id === key ? "selected" : ""}
-        on:click={() => handleSelect(key)}
-      >
-        <td>{portfolios[key].name}</td>
-      </tr>
-    {/each}
-  </table>
+  {#if portfolios}
+    <table>
+      {#each Object.keys(portfolios) as key}
+        <tr
+          class={selectedPortfolio?.id === key ? "selected" : ""}
+          on:click={() => handleSelect(key)}
+        >
+          <td>{portfolios[key].name}</td>
+        </tr>
+      {/each}
+    </table>
+  {/if}
+  <input on:input={handleChange} value={textValue} type="text" />
+  <button on:click={handleCreatePortfolio} disabled={!textValue}>Add</button>
 </div>
 
 <style>

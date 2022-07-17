@@ -41,36 +41,38 @@
   }
 </script>
 
-<div class="table module">
-  <h1>{selectedPortfolio?.name}</h1>
-  {#if expenses}
-    <table cellspacing={0} class="expenses">
-      {#each Object.keys(expenses) as id}
-        <tr
-          class={"expense" + (selectedExpense?.id === id ? " selected" : "")}
-          on:click={() => selectExpense(id)}
-        >
-          <td>{expenses[id].category}</td>
-          <td>
-            {new Intl.NumberFormat("it-IT", {
-              style: "currency",
-              currency: "EUR",
-            }).format(expenses[id].price)}
-          </td>
-          <td
-            >{new Date(expenses[id].date).toLocaleString("it-IT", {
-              dateStyle: "short",
-            })}</td
+{#if selectedPortfolio}
+  <div class="table module">
+    <h1>{selectedPortfolio?.name}</h1>
+    {#if expenses}
+      <table cellspacing={0} class="expenses">
+        {#each Object.keys(expenses) as id}
+          <tr
+            class={"expense" + (selectedExpense?.id === id ? " selected" : "")}
+            on:click={() => selectExpense(id)}
           >
-          <td>{expenses[id].notes}</td>
-        </tr>
-      {/each}
-    </table>
-  {/if}
-  {#if !Object.keys(expenses).length}
-    <p>No entries found</p>
-  {/if}
-</div>
+            <td>{expenses[id].category ?? ""}</td>
+            <td>
+              {new Intl.NumberFormat("it-IT", {
+                style: "currency",
+                currency: "EUR",
+              }).format(expenses[id].price)}
+            </td>
+            <td
+              >{new Date(expenses[id].date).toLocaleString("it-IT", {
+                dateStyle: "short",
+              })}</td
+            >
+            <td>{expenses[id].notes ?? ""}</td>
+          </tr>
+        {/each}
+      </table>
+    {/if}
+    {#if !Object.keys(expenses).length}
+      <p>No entries found</p>
+    {/if}
+  </div>
+{/if}
 
 <style>
   .expenses {

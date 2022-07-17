@@ -1,0 +1,31 @@
+<script>
+  export let callback;
+  export let disabled;
+  export let timeout = 2000;
+  let clickedOnce = false;
+  let timeoutId;
+
+  function handleClick() {
+    if (!clickedOnce) {
+      timeoutId = setTimeout(() => {
+        clickedOnce = false;
+      }, timeout);
+
+      return (clickedOnce = true);
+    }
+    if (timeoutId) clearTimeout(timeoutId);
+    callback();
+    clickedOnce = false;
+  }
+</script>
+
+<button {disabled} class={clickedOnce ? "active" : ""} on:click={handleClick}>
+  <slot />
+</button>
+
+<style>
+  .active {
+    background-color: red;
+    color: white;
+  }
+</style>

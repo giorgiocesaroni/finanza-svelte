@@ -1,23 +1,43 @@
-import { db } from "./Firebase";
 import {
-  query,
-  collection,
   addDoc,
-  updateDoc,
-  doc,
-  onSnapshot,
+  collection,
   deleteDoc,
-  orderBy,
+  doc,
   getDocs,
+  onSnapshot,
+  orderBy,
+  query,
+  setDoc,
+  updateDoc,
 } from "firebase/firestore";
+import { db } from "./Firebase";
 
-export function subscribeExpenses(uid, portfolio, onUpdate) {
-  if (!(uid && portfolio)) return;
+/**
+ * Basic Crud Functions
+ *
+ * get
+ * subscribe
+ * create (add)
+ * update
+ * delete
+ */
+export async function getCollection(uid, collectionId) {
+  if (!(uid || collectionId)) return;
 
-  const expensesQuery = query(
-    collection(db, `users/${uid}/portfolios/${portfolio}/expenses`),
-    orderBy("date", "desc")
-  );
+  const q = query(collection(db, `users/${uid}/${collectionId}`));
+  const snap = await getDocs(q);
+
+  const entries = {};
+  snap.forEach(doc => {
+    entries[doc.id] = doc.data();
+  });
+
+  return entries;
+}
+
+export function subscribeToCollection(uid, collectionId, onUpdate) {
+  if (!(uid || collection || onUpdate)) return;
+  const expensesQuery = query(collection(db, `users/${uid}/${collectionId}`));
 
   const unsubscribe = onSnapshot(expensesQuery, snap => {
     const entries = {};
@@ -31,43 +51,60 @@ export function subscribeExpenses(uid, portfolio, onUpdate) {
   return unsubscribe;
 }
 
-export async function getPortfolios(uid) {
+export function addDocument(uid, documentName, entry = {}) {
+  if (!(uid || documentName)) return;
+  addDoc(collection(db, `users/${uid}/${documentName}`), entry);
+}
+
+export function updateDocument(uid, collectionId, documentId, entry) {
   if (!uid) return;
+  const docRef = doc(
+    db,
+    `users/${uid}/portfolios/${collectionId}/${documentId}`
+  );
+  updateDoc(docRef, entry);
+}
 
-  const portfoliosQuery = query(collection(db, `users/${uid}/portfolios`));
-  const snap = await getDocs(portfoliosQuery);
+export function deleteDocument(uid, collectionId, documentId) {
+  if (!(uid || collectionId || documentId)) return;
+  deleteDoc(doc(db, `users/${uid}/${collectionId}/${documentId}`));
+}
 
-  const portfolios = {};
-  snap.forEach(doc => {
-    portfolios[doc.id] = doc.data();
-  });
+/**
+ * Domain Specific Handlers
+ */
+export function subscribeExpenses(uid, portfolio, onUpdate) {
+  return subscribeToCollection(
+    uid,
+    `portfolios/${portfolio}/expenses`,
+    onUpdate
+  );
+}
 
-  return portfolios;
+export function getPortfolios(uid) {
+  return getCollection(uid, "portfolios");
+}
+
+export function addPortfolio(uid, portfolio) {
+  return addDocument(uid, `portfolios`, portfolio);
+}
+
+export function getSubscriptions(uid) {
+  return getCollection(uid, "subscriptions");
 }
 
 export function addExpense(uid, portfolio, expense) {
-  if (!uid) return;
+  addDocument(uid, `portfolios/${portfolio}/expenses`, expense);
+}
 
-  addDoc(
-    collection(db, `users/${uid}/portfolios/${portfolio}/expenses`),
-    expense
-  );
+export function addSubscription(uid, subscription) {
+  addDocument(uid, "subscriptions", subscription);
 }
 
 export function updateExpense(uid, portfolio, expenseId, expense) {
-  if (!uid) return;
-
-  const docRef = doc(
-    db,
-    `users/${uid}/portfolios/${portfolio}/expenses/${expenseId}`
-  );
-  updateDoc(docRef, expense);
+  updateDocument(uid, `portfolio/${portfolio}/expenses`, expenseId, expense);
 }
 
 export function deleteExpense(uid, portfolio, expenseId) {
-  if (!uid) return;
-
-  deleteDoc(
-    doc(db, `users/${uid}/portfolios/${portfolio}/expenses/${expenseId}`)
-  );
+  deleteDocument(uid, `portfolios/${portfolio}/expenses`, expenseId);
 }

@@ -5,6 +5,7 @@
     selectedExpenseStore,
     selectedPortfolioStore,
   } from "../stores";
+  import SafeButton from "./components/SafeButton.svelte";
 
   let auth;
   authStore.subscribe(value => (auth = value));
@@ -25,15 +26,9 @@
     selectedExpenseStore.set(null);
   }
 
-  let clickedOnce = false;
-  function handleDelete(event) {
-    event.preventDefault();
-
-    if (!clickedOnce) return (clickedOnce = true);
-
+  function handleDelete() {
     deleteExpense(auth.user.uid, selectedPortfolio.id, editingExpense.id);
     resetExpense();
-    clickedOnce = false;
   }
 
   function handleClear() {
@@ -62,8 +57,8 @@
 </script>
 
 <div class="editor module">
-  <!-- <h1 on:click={() => (clickedOnce = false)}>Editor</h1> -->
-  <form class={editingExpense ? "selected" : ""}>
+  <h1>Editor</h1>
+  <form>
     <input
       on:input={e => handleChange("category", e.target.value)}
       on:keydown={handleKeyDown}
@@ -100,13 +95,9 @@
       disabled={!editingExpense}
       class="clear-button">Clear</button
     >
-    <button
-      disabled={!editingExpense?.id}
-      class={"delete-button" + (clickedOnce ? " active" : "")}
-      on:click={handleDelete}
-    >
+    <SafeButton callback={handleDelete} disabled={!editingExpense}>
       Delete
-    </button>
+    </SafeButton>
   </div>
 </div>
 
