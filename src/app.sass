@@ -20,9 +20,14 @@ body
   font-family: $font-family
   padding-block: 1rem
   padding-bottom: 2rem
+  color: yellow
+  background: black
 
 input
   font: inherit
+  color: inherit
+  background: none
+  border: $border !important
 
 main
   display: grid
@@ -31,23 +36,24 @@ main
   margin: 0 auto
 
 .module
-  padding: $module-padding
+  padding: 1rem
+  background: inherit
+  border: 1px solid orange
 
 .editor
-  border: $border
-
-.table
-  border: $border
-
-.authentication
-  border: $border
+  background: black
+  position: sticky
+  top: 0
 
 button
-  font: inherit
+  font: inherit !important
+  background: none
+  color: yellow
+  padding: .5rem
 
 .selected
-  background: blue !important
-  color: white
+  background: yellow !important
+  color: black
 
 .editor form
   display: flex

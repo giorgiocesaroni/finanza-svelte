@@ -17,10 +17,15 @@ body {
   font-family: "Monaco", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   padding-block: 1rem;
   padding-bottom: 2rem;
+  color: yellow;
+  background: black;
 }
 
 input {
   font: inherit;
+  color: inherit;
+  background: none;
+  border: 1px solid !important;
 }
 
 main {
@@ -33,27 +38,27 @@ main {
 
 .module {
   padding: 1rem;
+  background: inherit;
+  border: 1px solid orange;
 }
 
 .editor {
-  border: 1px solid;
-}
-
-.table {
-  border: 1px solid;
-}
-
-.authentication {
-  border: 1px solid;
+  background: black;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
 }
 
 button {
-  font: inherit;
+  font: inherit !important;
+  background: none;
+  color: yellow;
+  padding: .5rem;
 }
 
 .selected {
-  background: blue !important;
-  color: white;
+  background: yellow !important;
+  color: black;
 }
 
 .editor form {

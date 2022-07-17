@@ -50,17 +50,20 @@
             on:click={() => selectExpense(id)}
           >
             <td>{supportedCategories[expenses[id].category] ?? "❓"}</td>
+
             <td class="price">
               {new Intl.NumberFormat("it-IT", {
                 style: "currency",
                 currency: "EUR",
               }).format(expenses[id].price)}
             </td>
+
             <td>
               {new Date(expenses[id].date).toLocaleString("it-IT", {
                 dateStyle: "short",
               })}
             </td>
+
             <td>{expenses[id].notes ?? ""}</td>
           </tr>
         {/each}
@@ -73,26 +76,18 @@
 {/if}
 
 <style>
-  .expenses {
-    width: 100%;
+  table {
+    display: grid;
   }
-
-  .expense:nth-child(odd) {
-    background: rgb(245, 245, 245);
-  }
-
-  .price {
-    text-align: right;
-  }
-
-  td {
-    padding-right: 1.5rem;
-    padding-top: .5rem;
-    padding-bottom: .5rem;
-  }
-
+  
   tr {
-    border: 1px solid #000;
-    gap: 3rem;
+    display: grid;
+    grid-template-columns: auto repeat(3, 1fr);
+    gap: 1.5rem;
+    padding-block: .5rem;
   }
+
+  /* tr:nth-child(odd) {
+    background: rgb(245, 245, 245);
+  } */
 </style>

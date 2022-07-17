@@ -8,7 +8,7 @@
   } from "../stores";
   import SafeButton from "./components/SafeButton.svelte";
   import RadioSwitch from "./components/RadioSwitch.svelte";
-import supportedCategories from "./utilities/mockSupportedCategories";
+  import supportedCategories from "./utilities/mockSupportedCategories";
 
   let auth;
   authStore.subscribe(value => (auth = value));
@@ -60,32 +60,33 @@ import supportedCategories from "./utilities/mockSupportedCategories";
 </script>
 
 <div class="editor module">
-  <h1>Editor</h1>
   <form>
-    <input
-      use:blurOnEnter
-      on:input={e => handleChange("date", e.target.value)}
-      on:keydown={handleKeyDown}
-      value={editingExpense?.date ?? ""}
-      placeholder="Date"
-      class="date"
-    />
-    <input
-      use:blurOnEnter
-      on:input={e => handleChange("notes", e.target.value)}
-      on:keydown={handleKeyDown}
-      value={editingExpense?.notes ?? ""}
-      placeholder="Notes"
-      class="notes"
-    />
-    <input
-      use:blurOnEnter
-      on:input={e => handleChange("price", e.target.value)}
-      on:keydown={handleKeyDown}
-      value={editingExpense?.price ?? ""}
-      placeholder="Price"
-      class="price"
-    />
+    <div style="width: 100%">
+      <input
+        use:blurOnEnter
+        on:input={e => handleChange("date", e.target.value)}
+        on:keydown={handleKeyDown}
+        value={editingExpense?.date ?? ""}
+        placeholder="Date"
+        class="date"
+      />
+      <input
+        use:blurOnEnter
+        on:input={e => handleChange("notes", e.target.value)}
+        on:keydown={handleKeyDown}
+        value={editingExpense?.notes ?? ""}
+        placeholder="Notes"
+        class="notes"
+      />
+      <input
+        use:blurOnEnter
+        on:input={e => handleChange("price", e.target.value)}
+        on:keydown={handleKeyDown}
+        value={editingExpense?.price ?? ""}
+        placeholder="Price"
+        class="price"
+      />
+    </div>
     <RadioSwitch
       onChange={value => handleChange("category", value)}
       value={editingExpense?.category}
@@ -122,8 +123,6 @@ import supportedCategories from "./utilities/mockSupportedCategories";
   }
 
   form input {
-    color: white;
-    background: black;
     width: 100%;
     border: none;
   }
