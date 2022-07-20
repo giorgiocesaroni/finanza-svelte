@@ -5,6 +5,7 @@
     selectedExpenseStore,
     selectedPortfolioStore,
   } from "../stores";
+  import { fade } from "svelte/transition";
   import { subscribeExpenses } from "../Firestore";
   import supportedCategories from "./utilities/mockSupportedCategories";
 
@@ -19,15 +20,15 @@
 
     if (!value) return;
     unsubscribe = subscribeExpenses(
-      auth.user.uid,
+      auth.uid,
       selectedPortfolio.id,
       expensesStore.set
     );
   });
 
-  let expenses = {};
+  let expenses = null;
   expensesStore.subscribe(value => {
-    expenses = value ?? {};
+    expenses = value;
   });
 
   let selectedExpense;
@@ -39,55 +40,46 @@
   }
 </script>
 
-{#if selectedPortfolio}
-  <div class="table module">
+{#if selectedPortfolio && expenses}
+  <div transition:fade class="table module">
     <h1>{selectedPortfolio?.name} Expenses</h1>
     {#if expenses}
-      <table cellspacing={0} class="expenses">
+      <div class="expenses table">
+        <div class="table-head">
+          <span>Category</span>
+          <span>Price</span>
+          <span>Date</span>
+          <span>Notes</span>
+        </div>
         {#each Object.keys(expenses) as id}
-          <tr
+          <div
             class={"expense" + (selectedExpense?.id === id ? " selected" : "")}
             on:click={() => selectExpense(id)}
           >
-            <td>{supportedCategories[expenses[id].category] ?? "❓"}</td>
+            <span class="category">
+              {supportedCategories[expenses[id].category] ?? "❓"}
+            </span>
 
-            <td class="price">
+            <span class="price">
               {new Intl.NumberFormat("it-IT", {
                 style: "currency",
                 currency: "EUR",
               }).format(expenses[id].price)}
-            </td>
+            </span>
 
-            <td>
+            <span class="date">
               {new Date(expenses[id].date).toLocaleString("it-IT", {
                 dateStyle: "short",
               })}
-            </td>
+            </span>
 
-            <td>{expenses[id].notes ?? ""}</td>
-          </tr>
+            <span class="notes">{expenses[id].notes ?? ""}</span>
+          </div>
         {/each}
-      </table>
+      </div>
     {/if}
-    {#if !Object.keys(expenses).length}
+    {#if !expenses}
       <p>No entries found</p>
     {/if}
   </div>
 {/if}
-
-<style>
-  table {
-    display: grid;
-  }
-  
-  tr {
-    display: grid;
-    grid-template-columns: auto repeat(3, 1fr);
-    gap: 1.5rem;
-    padding-block: .5rem;
-  }
-
-  /* tr:nth-child(odd) {
-    background: rgb(245, 245, 245);
-  } */
-</style>

@@ -10,7 +10,6 @@
     selectedPortfolioStore,
   } from "../stores";
   import SafeButton from "./components/SafeButton.svelte";
-  export let title;
 
   let portfolios;
   let authorization, unsubscribe;
@@ -20,8 +19,8 @@
 
     if (unsubscribe) unsubscribe();
 
-    console.log(auth.user.uid);
-    unsubscribe = subscribeToCollection(auth.user.uid, "portfolios", value => {
+    console.log(auth.uid);
+    unsubscribe = subscribeToCollection(auth.uid, "portfolios", value => {
       portfolios = value;
     });
   });
@@ -43,7 +42,8 @@
     textValue = value;
   }
 
-  async function handleCreatePortfolio() {
+  async function handleCreatePortfolio(event) {
+    event.preventDefault();
     addPortfolio(authorization.user.uid, {
       name: textValue,
     });
@@ -58,30 +58,33 @@
   }
 </script>
 
-<div class="table module">
-  <h1>{title}</h1>
+<div class="module">
+  <h1>Portfolios</h1>
   {#if portfolios}
-    <table>
+    <div class="portfolios-tags">
       {#each Object.keys(portfolios) as key}
-        <tr
+        <button
           class={selectedPortfolio?.id === key ? "selected" : ""}
           on:click={() => handleSelect(key)}
         >
-          <td>{portfolios[key].name}</td>
-        </tr>
+          <div>
+            <p>
+              {portfolios[key].name}
+            </p>
+          </div>
+        </button>
       {/each}
-    </table>
+      <form action="">
+        <input on:input={handleChange} value={textValue} type="text" />
+        <button
+          type="submit"
+          on:click={handleCreatePortfolio}
+          disabled={!textValue}>Add</button
+        >
+      </form>
+      <SafeButton callback={handleDeletePortfolio} disabled={!selectedPortfolio}
+        >Delete portfolio</SafeButton
+      >
+    </div>
   {/if}
-  <form>
-    <input on:input={handleChange} value={textValue} type="text" />
-    <button type="submit" on:click={handleCreatePortfolio} disabled={!textValue}
-      >Add</button
-    >
-  </form>
-  <SafeButton callback={handleDeletePortfolio} disabled={!selectedPortfolio}
-    >Delete portfolio</SafeButton
-  >
 </div>
-
-<style>
-</style>

@@ -22,10 +22,3 @@
 <button {disabled} class={clickedOnce ? "active" : ""} on:click={handleClick}>
   <slot />
 </button>
-
-<style>
-  .active {
-    background-color: red;
-    color: white;
-  }
-</style>

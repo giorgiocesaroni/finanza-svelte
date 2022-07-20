@@ -10,14 +10,11 @@
 
   async function handleLogin() {
     if (authentication) return; // Logout
-    const auth = await googleLogin();
-    console.log(auth);
-    authStore.set(auth);
+    await googleLogin();
   }
 
   async function handleLogout() {
     await logout();
-    authStore.set(null);
     expensesStore.set(null);
   }
 </script>
@@ -25,7 +22,7 @@
 <div class="authentication module">
   <h1>Authentication</h1>
   {#if authentication}
-    <p>Logged in as {authentication.user.email}</p>
+    <p>Logged in as {authentication.email}</p>
   {/if}
   <LoginButton
     {authentication}

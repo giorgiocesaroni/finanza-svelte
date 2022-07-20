@@ -1,21 +1,25 @@
 <script>
-  import Editor from "./lib/Editor.svelte";
-  import Expenses from "./lib/ExpensesTable.svelte";
-  import Authentication from "./lib/Authentication.svelte";
   import "./Firebase";
+  import { onAuthChange } from "./GoogleAuth";
+  import Authentication from "./lib/Authentication.svelte";
+  import Editor from "./lib/Editor.svelte";
+  import { default as ExpensesTable } from "./lib/ExpensesTable.svelte";
+  import { default as PortfoliosTable } from "./lib/PortfoliosTable.svelte";
   import { authStore } from "./stores";
-  import Portfolios from "./lib/PortfoliosTable.svelte";
 
   let authentication;
-  authStore.subscribe(auth => (authentication = auth));
+  authStore.subscribe(auth => {
+    authentication = auth;
+  });
+
+  onAuthChange(authStore.set);
 </script>
 
 <main>
   {#if authentication}
-    <h1>Finanza</h1>
     <Editor />
-    <Portfolios title="Portfolios" />
-    <Expenses />
+    <PortfoliosTable />
+    <ExpensesTable />
   {:else}
     <h1>Welcome to Finanza</h1>
   {/if}

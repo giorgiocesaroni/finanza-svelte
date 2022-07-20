@@ -1,9 +1,10 @@
 import {
+  browserSessionPersistence,
   getAuth,
   GoogleAuthProvider,
-  inMemoryPersistence,
+  onAuthStateChanged,
   setPersistence,
-  signInWithPopup,
+  signInWithRedirect,
   signOut,
 } from "firebase/auth";
 
@@ -11,13 +12,13 @@ export async function googleLogin() {
   const auth = getAuth();
 
   try {
-    await setPersistence(auth, inMemoryPersistence);
+    await setPersistence(auth, browserSessionPersistence);
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({
       prompt: "select_account",
     });
 
-    return await signInWithPopup(auth, provider);
+    return await signInWithRedirect(auth, provider);
   } catch (error) {
     const errorCode = error.code;
     const errorMessage = error.message;
@@ -28,4 +29,13 @@ export async function googleLogin() {
 export function logout() {
   const auth = getAuth();
   return signOut(auth);
+}
+
+export function onAuthChange(onChange) {
+  const auth = getAuth();
+
+  onAuthStateChanged(auth, user => {
+    console.log("onAuthStateChanged", user);
+    onChange(user);
+  });
 }

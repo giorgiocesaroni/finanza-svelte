@@ -9,7 +9,10 @@
   }
 </script>
 
-<fieldset class="radio-switch" on:input={handleRadioChange}>
+<fieldset
+  class={"radio-switch" + ($$props.class ? ` ${$$props.class}` : "")}
+  on:input={handleRadioChange}
+>
   {#each Object.keys(options) as option}
     <div class={"option" + (value === option ? " selected" : "")}>
       <label for={option}>
@@ -24,34 +27,3 @@
     </div>
   {/each}
 </fieldset>
-
-<style>
-  fieldset {
-    padding: 0;
-    margin: 0;
-    border: none;
-  }
-
-  input {
-    display: none;
-  }
-
-  label {
-    padding: 0.75rem;
-  }
-
-  .option {
-    display: grid;
-  }
-
-  .radio-switch {
-    display: grid;
-    grid-auto-flow: column;
-    justify-items: center;
-    background-color: rgb(245, 245, 245);
-  }
-
-  .selected {
-    background-color: rgb(235, 235, 235) !important;
-  }
-</style>

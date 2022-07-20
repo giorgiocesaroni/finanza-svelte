@@ -30,7 +30,7 @@
   }
 
   function handleDelete() {
-    deleteExpense(auth.user.uid, selectedPortfolio.id, editingExpense.id);
+    deleteExpense(auth.uid, selectedPortfolio.id, editingExpense.id);
     resetExpense();
   }
 
@@ -41,7 +41,7 @@
   function handleSubmit() {
     if (editingExpense?.id) {
       updateExpense(
-        auth.user.uid,
+        auth.uid,
         selectedPortfolio.id,
         editingExpense.id,
         editingExpense
@@ -49,7 +49,7 @@
     } else {
       let date = editingExpense.date ?? new Date().getTime();
       editingExpense = { ...editingExpense, date };
-      addExpense(auth.user.uid, selectedPortfolio.id, editingExpense);
+      addExpense(auth.uid, selectedPortfolio.id, editingExpense);
     }
     resetExpense();
   }
@@ -59,40 +59,40 @@
   }
 </script>
 
-<div class="editor module">
+<div class="editor">
   <form>
-    <div style="width: 100%">
-      <input
-        use:blurOnEnter
-        on:input={e => handleChange("date", e.target.value)}
-        on:keydown={handleKeyDown}
-        value={editingExpense?.date ?? ""}
-        placeholder="Date"
-        class="date"
-      />
-      <input
-        use:blurOnEnter
-        on:input={e => handleChange("notes", e.target.value)}
-        on:keydown={handleKeyDown}
-        value={editingExpense?.notes ?? ""}
-        placeholder="Notes"
-        class="notes"
-      />
-      <input
-        use:blurOnEnter
-        on:input={e => handleChange("price", e.target.value)}
-        on:keydown={handleKeyDown}
-        value={editingExpense?.price ?? ""}
-        placeholder="Price"
-        class="price"
-      />
-    </div>
-    <RadioSwitch
-      onChange={value => handleChange("category", value)}
-      value={editingExpense?.category}
-      options={supportedCategories}
+    <input
+      use:blurOnEnter
+      on:input={e => handleChange("date", e.target.value)}
+      on:keydown={handleKeyDown}
+      value={editingExpense?.date ?? ""}
+      placeholder="Date"
+      class="date"
+    />
+    <input
+      use:blurOnEnter
+      on:input={e => handleChange("notes", e.target.value)}
+      on:keydown={handleKeyDown}
+      value={editingExpense?.notes ?? ""}
+      placeholder="Notes"
+      class="notes"
+    />
+    <input
+      use:blurOnEnter
+      on:input={e => handleChange("price", e.target.value)}
+      on:keydown={handleKeyDown}
+      value={editingExpense?.price ?? ""}
+      placeholder="Price"
+      class="price"
     />
   </form>
+
+  <RadioSwitch
+    class="categories"
+    onChange={value => handleChange("category", value)}
+    value={editingExpense?.category}
+    options={supportedCategories}
+  />
 
   <div class="actions">
     <button
@@ -105,35 +105,14 @@
 
     <button
       on:click={handleSubmit}
-      disabled={!editingExpense}
+      disabled={!editingExpense || !selectedPortfolio}
       class="submit-button"
     >
       Submit
     </button>
 
-    <SafeButton callback={handleDelete} disabled={!editingExpense}>
+    <SafeButton callback={handleDelete} disabled={!editingExpense?.id}>
       Delete
     </SafeButton>
   </div>
 </div>
-
-<style>
-  form {
-    margin-bottom: 1rem;
-  }
-
-  form input {
-    width: 100%;
-    border: none;
-  }
-
-  form input::placeholder {
-    color: inherit;
-    opacity: 0.75;
-  }
-
-  .price {
-    text-align: right;
-    font-size: 1.5rem;
-  }
-</style>
