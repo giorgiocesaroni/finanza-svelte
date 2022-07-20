@@ -5,31 +5,28 @@
     selectedExpenseStore,
     selectedPortfolioStore,
   } from "../stores";
-  import { fade } from "svelte/transition";
   import { subscribeExpenses } from "../Firestore";
   import supportedCategories from "./utilities/mockSupportedCategories";
+  import Accordion from "./components/Accordion.svelte";
+  import { onDestroy } from "svelte";
+  import ResizablePanel from "./components/ResizablePanel.svelte";
+  export let portfolio;
 
   let auth;
   authStore.subscribe(value => (auth = value));
 
-  let selectedPortfolio, unsubscribe;
-  selectedPortfolioStore.subscribe(value => {
-    if (unsubscribe) unsubscribe();
-    expensesStore.set(null);
-    selectedPortfolio = value;
-
-    if (!value) return;
-    unsubscribe = subscribeExpenses(
-      auth.uid,
-      selectedPortfolio.id,
-      expensesStore.set
-    );
-  });
-
-  let expenses = null;
+  let expenses;
   expensesStore.subscribe(value => {
     expenses = value;
   });
+
+  let unsubscribe;
+
+  $: {
+    unsubscribe = subscribeExpenses(auth.uid, portfolio.id, expensesStore.set);
+  }
+
+  onDestroy(() => unsubscribe());
 
   let selectedExpense;
   selectedExpenseStore.subscribe(value => (selectedExpense = value));
@@ -40,46 +37,51 @@
   }
 </script>
 
-{#if selectedPortfolio && expenses}
-  <div transition:fade class="table module">
-    <h1>{selectedPortfolio?.name} Expenses</h1>
-    {#if expenses}
-      <div class="expenses table">
-        <div class="table-head">
-          <span>Category</span>
-          <span>Price</span>
-          <span>Date</span>
-          <span>Notes</span>
-        </div>
-        {#each Object.keys(expenses) as id}
-          <div
-            class={"expense" + (selectedExpense?.id === id ? " selected" : "")}
-            on:click={() => selectExpense(id)}
-          >
-            <span class="category">
-              {supportedCategories[expenses[id].category] ?? "❓"}
-            </span>
+{#if expenses}
+  <Accordion>
+    <ResizablePanel>
+      <div class="table module">
+        <h1>{portfolio.name} Expenses</h1>
+        {#if expenses}
+          <div class="expenses table">
+            <div class="table-head">
+              <span>Category</span>
+              <span>Price</span>
+              <span>Date</span>
+              <span>Notes</span>
+            </div>
+            {#each Object.keys(expenses) as id}
+              <div
+                class={"expense" +
+                  (selectedExpense?.id === id ? " selected" : "")}
+                on:click={() => selectExpense(id)}
+              >
+                <span class="category">
+                  {supportedCategories[expenses[id].category] ?? "❓"}
+                </span>
 
-            <span class="price">
-              {new Intl.NumberFormat("it-IT", {
-                style: "currency",
-                currency: "EUR",
-              }).format(expenses[id].price)}
-            </span>
+                <span class="price">
+                  {new Intl.NumberFormat("it-IT", {
+                    style: "currency",
+                    currency: "EUR",
+                  }).format(expenses[id].price)}
+                </span>
 
-            <span class="date">
-              {new Date(expenses[id].date).toLocaleString("it-IT", {
-                dateStyle: "short",
-              })}
-            </span>
+                <span class="date">
+                  {new Date(expenses[id].date).toLocaleString("it-IT", {
+                    dateStyle: "short",
+                  })}
+                </span>
 
-            <span class="notes">{expenses[id].notes ?? ""}</span>
+                <span class="notes">{expenses[id].notes ?? ""}</span>
+              </div>
+            {/each}
           </div>
-        {/each}
+        {/if}
+        {#if !expenses}
+          <p>No entries found</p>
+        {/if}
       </div>
-    {/if}
-    {#if !expenses}
-      <p>No entries found</p>
-    {/if}
-  </div>
+    </ResizablePanel>
+  </Accordion>
 {/if}

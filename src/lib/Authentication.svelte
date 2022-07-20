@@ -15,6 +15,7 @@
 
   async function handleLogout() {
     await logout();
+    authStore.set(null);
     expensesStore.set(null);
   }
 </script>

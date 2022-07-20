@@ -82,9 +82,12 @@ h1 {
 main {
   padding: var(--normal-padding);
   display: grid;
-  gap: var(--normal-gap);
   max-width: var(--app-max-width);
   margin: 0 auto;
+}
+
+.flow > *:not(:last-child){
+  margin-bottom: 1rem;
 }
 
 .module {

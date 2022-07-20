@@ -36,6 +36,6 @@ export function onAuthChange(onChange) {
 
   onAuthStateChanged(auth, user => {
     console.log("onAuthStateChanged", user);
-    onChange(user);
+    if (user) onChange(user);
   });
 }
