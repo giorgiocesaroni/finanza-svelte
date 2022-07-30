@@ -1,6 +1,6 @@
 <script>
   export let callback;
-  export let disabled;
+  export let disabled = false;
   export let timeout = 2000;
   let clickedOnce = false;
   let timeoutId;

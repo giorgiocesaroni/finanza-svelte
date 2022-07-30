@@ -1,7 +1,7 @@
 <script>
-  import LoginButton from "./LoginButton.svelte";
   import { googleLogin, logout } from "../GoogleAuth";
   import { authStore, expensesStore } from "../stores";
+  import SafeButton from "./components/SafeButton.svelte";
 
   let authentication;
   authStore.subscribe(value => {
@@ -24,9 +24,8 @@
   <h1>Authentication</h1>
   {#if authentication}
     <p>Logged in as {authentication.email}</p>
+    <SafeButton callback={handleLogout}>Logout</SafeButton>
+  {:else}
+    <button on:click={handleLogin}>Login</button>
   {/if}
-  <LoginButton
-    {authentication}
-    on:click={authentication ? handleLogout : handleLogin}
-  />
 </div>

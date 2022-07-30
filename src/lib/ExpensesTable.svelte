@@ -1,10 +1,5 @@
 <script>
-  import {
-    expensesStore,
-    authStore,
-    selectedExpenseStore,
-    selectedPortfolioStore,
-  } from "../stores";
+  import { expensesStore, authStore, selectedExpenseStore } from "../stores";
   import { subscribeExpenses } from "../Firestore";
   import supportedCategories from "./utilities/mockSupportedCategories";
   import Accordion from "./components/Accordion.svelte";
@@ -26,7 +21,10 @@
     unsubscribe = subscribeExpenses(auth.uid, portfolio.id, expensesStore.set);
   }
 
-  onDestroy(() => unsubscribe());
+  onDestroy(() => {
+    expensesStore.set(null);
+    unsubscribe();
+  });
 
   let selectedExpense;
   selectedExpenseStore.subscribe(value => (selectedExpense = value));

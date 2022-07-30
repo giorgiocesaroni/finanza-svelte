@@ -86,7 +86,7 @@ main {
   margin: 0 auto;
 }
 
-.flow > *:not(:last-child){
+.flow > *:not(:last-child) {
   margin-bottom: 1rem;
 }
 

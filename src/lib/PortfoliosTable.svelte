@@ -44,7 +44,7 @@
 
   async function handleCreatePortfolio(event) {
     event.preventDefault();
-    addPortfolio(authorization.user.uid, {
+    addPortfolio(authorization.uid, {
       name: textValue,
     });
 
@@ -52,7 +52,7 @@
   }
 
   function handleDeletePortfolio() {
-    deletePortfolio(authorization.user.uid, selectedPortfolio.id);
+    deletePortfolio(authorization.uid, selectedPortfolio.id);
     selectedExpenseStore.set(null);
     selectedPortfolioStore.set(null);
   }
@@ -74,17 +74,27 @@
           </div>
         </button>
       {/each}
-      <form action="">
-        <input on:input={handleChange} value={textValue} type="text" />
-        <button
-          type="submit"
-          on:click={handleCreatePortfolio}
-          disabled={!textValue}>Add</button
-        >
-      </form>
+    </div>
+    <div class="actions">
+      <input on:input={handleChange} value={textValue} type="text" />
+      <button
+        type="submit"
+        on:click={handleCreatePortfolio}
+        disabled={!textValue}>Add</button
+      >
       <SafeButton callback={handleDeletePortfolio} disabled={!selectedPortfolio}
         >Delete portfolio</SafeButton
       >
     </div>
   {/if}
 </div>
+
+<style>
+  .actions {
+    display: grid;
+    grid-auto-flow: column;
+    justify-content: end;
+    gap: 0.5rem;
+    margin-top: .5rem;
+  }
+</style>

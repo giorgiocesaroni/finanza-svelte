@@ -17,6 +17,6 @@
 
 <style>
   .resizable-container {
-    transition: height 0.5s ease;
+    transition: height 0.25s ease;
   }
 </style>
